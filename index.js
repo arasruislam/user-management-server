@@ -34,17 +34,41 @@ async function run() {
     });
 
     app.get("/users/:id", async (req, res) => {
-
       const result = await userManager.findOne({
         _id: new ObjectId(req.params.id),
       });
 
       res.send(result);
-      
     });
 
     app.post("/users", async (req, res) => {
       const result = await userManager.insertOne(req.body);
+      res.send(result);
+    });
+
+    app.put("/users/:id", async (req, res) => {
+      const updatedUser = req.body;
+      const filter = { _id: new ObjectId(req.params.id) };
+      const options = { upsert: true };
+
+      const updatedDoc = {
+        $set: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          gender: updatedUser.gender,
+          status: updatedUser.status,
+        },
+      };
+
+      const result = await userManager.updateOne(filter, updatedDoc, options);
+      res.send(result);
+    });
+
+    app.delete("/users/:id", async (req, res) => {
+      const result = await userManager.deleteOne({
+        _id: new ObjectId(req.params.id),
+      });
+
       res.send(result);
     });
 
